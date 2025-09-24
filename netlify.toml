@@ -71,8 +71,8 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # Security headers
-    X-Frame-Options = "DENY"
+    # Security headers - CSP allows specific domains to embed
+    Content-Security-Policy = "frame-ancestors 'self' https://wtm-aussenwerbung.de https://wtm-aussenwerbung-berlin.de;"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
