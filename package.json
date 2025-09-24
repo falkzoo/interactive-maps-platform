@@ -1,0 +1,32 @@
+{
+  "name": "interactive-maps-platform",
+  "version": "1.0.0",
+  "description": "A scalable, multi-city interactive mapping platform built with Leaflet.js",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx serve . -p 3000",
+    "test": "echo \"No tests specified\" && exit 0",
+    "lint": "echo \"No linting configured\" && exit 0"
+  },
+  "keywords": [
+    "maps",
+    "leaflet",
+    "interactive",
+    "netlify",
+    "geojson",
+    "multi-city"
+  ],
+  "author": "Interactive Maps Platform",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/interactive-maps-platform.git"
+  },
+  "homepage": "https://your-maps-platform.netlify.app"
+}

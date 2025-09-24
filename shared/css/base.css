@@ -1,0 +1,145 @@
+/* ==========================================================================
+   BASE STYLES & CSS CUSTOM PROPERTIES
+   ========================================================================== */
+
+/* Design tokens */
+:root {
+  /* Colors */
+  --panel-bg: #ffffff;
+  --panel-fg: #1f2328;
+  --muted-fg: #5b6168;
+  --surface: #f6f8fa;
+  --border: #d0d7de;
+  --accent: #0969da;
+  --primary: #007cba;
+  --primary-dark: #005a85;
+  
+  /* Layout */
+  --radius: 12px;
+  --shadow: 0 2px 24px rgba(0, 0, 0, 0.12);
+  --gutter: 20px;
+  
+  /* Typography */
+  --fs-title: 22px;
+  --fs-body: 15px;
+  --lh: 1.5;
+  
+  /* Map specific */
+  --map-height: 700px;
+  --transport-color-s1: #DE4DA4;
+  --transport-color-s2: #006F35;
+  --transport-color-s25: #006F35;
+  --transport-color-s3: #003F7F;
+  --transport-color-s41: #A23B1E;
+  --transport-color-s5: #FF6600;
+  --transport-color-s9: #8B1538;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { 
+    transition: none !important; 
+    animation: none !important; 
+  }
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: var(--lh);
+  margin: 0;
+  padding: 0;
+  color: var(--panel-fg);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 1rem;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: var(--fs-title);
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Page structure */
+.map-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-header {
+  padding: 1rem 0;
+  text-align: center;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.page-header h1 {
+  margin: 0;
+  flex: 1;
+}
+
+.controls-section {
+  padding: 1rem;
+  background: var(--panel-bg);
+}
+
+.map-section {
+  flex: 1;
+  position: relative;
+}
+
+/* Map container */
+#map {
+  height: var(--map-height);
+  position: relative;
+  width: 100%;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  :root {
+    --map-height: 500px;
+    --gutter: 15px;
+    --fs-title: 18px;
+  }
+  
+  .page-header {
+    padding: 0.5rem;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .controls-section {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --map-height: 400px;
+  }
+}

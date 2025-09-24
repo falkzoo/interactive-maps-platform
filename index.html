@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interactive Maps Platform</title>
+    <meta
+      name="description"
+      content="Interactive mapping platform with city maps and media location maps"
+    />
+    <link rel="stylesheet" href="shared/css/base.css" />
+    <link rel="stylesheet" href="shared/css/components.css" />
+  </head>
+
+  <body>
+    <main class="map-container">
+      <header class="page-header">
+        <h1>Interactive Maps Platform</h1>
+        <p>Choose your map type and city below</p>
+      </header>
+
+      <section style="padding: 2rem; max-width: 800px; margin: 0 auto">
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+          "
+        >
+          <!-- City Maps -->
+          <div
+            style="
+              border: 1px solid var(--border);
+              border-radius: var(--radius);
+              padding: 1.5rem;
+            "
+          >
+            <h2 style="color: var(--accent); margin-top: 0">🏙️ City Maps</h2>
+            <p style="color: var(--muted-fg); margin-bottom: 1rem">
+              District boundaries, transportation routes, and city statistics
+            </p>
+            <ul style="list-style: none; padding: 0">
+              <li style="margin-bottom: 0.5rem">
+                <a
+                  href="/city-maps/berlin"
+                  style="
+                    color: var(--accent);
+                    text-decoration: none;
+                    font-weight: 500;
+                  "
+                >
+                  → Berlin Districts & Transportation
+                </a>
+              </li>
+              <li style="margin-bottom: 0.5rem; color: var(--muted-fg)">
+                → Hamburg (coming soon)
+              </li>
+              <li style="margin-bottom: 0.5rem; color: var(--muted-fg)">
+                → Munich (coming soon)
+              </li>
+            </ul>
+          </div>
+
+          <!-- Media Maps -->
+          <div
+            style="
+              border: 1px solid var(--border);
+              border-radius: var(--radius);
+              padding: 1.5rem;
+            "
+          >
+            <h2 style="color: var(--accent); margin-top: 0">📍 Media Maps</h2>
+            <p style="color: var(--muted-fg); margin-bottom: 1rem">
+              Advertising locations, billboards, and media planning
+            </p>
+            <ul style="list-style: none; padding: 0">
+              <li style="margin-bottom: 0.5rem">
+                <a
+                  href="/media-maps/berlin"
+                  style="
+                    color: var(--accent);
+                    text-decoration: none;
+                    font-weight: 500;
+                  "
+                >
+                  → Berlin Media Locations
+                </a>
+                <div
+                  style="
+                    font-size: 0.8em;
+                    color: var(--muted-fg);
+                    margin-left: 1rem;
+                  "
+                >
+                  Multiple map styles available
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Auto-redirect after 10 seconds to Berlin city map
+      setTimeout(() => {
+        if (confirm("Redirect to Berlin city map?")) {
+          window.location.href = "/city-maps/berlin";
+        }
+      }, 10000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,186 @@
+
+/* ==========================================================================
+   BASE STYLES (Original)
+   ========================================================================== */
+
+/* Base map container */
+#map {
+  height: 700px;
+  position: relative;
+}
+
+/* ==========================================================================
+   DISTRICT PANEL (Original Right Sidebar Styling)
+   ========================================================================== */
+
+.leaflet-bottom.leaflet-right,
+.leaflet-top.leaflet-right {
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.leaflet-right .leaflet-control.info {
+  position: absolute;
+  inset: 0 0 0 auto;
+  margin: 0;
+  padding: 0;
+  width: clamp(320px, 34vw, 560px);
+  pointer-events: auto;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  opacity: 1;
+}
+
+.district-panel {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background: var(--panel-bg);
+  color: var(--panel-fg);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+}
+
+.district-panel__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.district-panel__title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.district-panel__body {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 20px 20px;
+}
+
+.district-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+/* Chip styles moved to components.css for shared use */
+
+.district-panel__notes {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+  color: var(--muted-fg);
+  font-size: 15px;
+}
+
+.district-panel__footer {
+  padding: 10px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.source {
+  color: var(--muted-fg);
+}
+
+.logo {
+  width: 64px;
+  height: auto;
+  float: right;
+}
+
+.district-panel a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.district-panel a:hover {
+  text-decoration: underline;
+  text-align: center;
+}
+
+.district-label {
+  color: "#6e7471";
+  background: transparent;
+  border-style: none;
+  box-shadow: none;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* ==========================================================================
+   TRANSPORTATION TOGGLE BUTTON (Original Styling)
+   ========================================================================== */
+
+.transport-toggle {
+  position: absolute;
+  top: 10px;
+  left: 60px;
+  background: var(--panel-bg);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--panel-fg);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: all 0.2s ease;
+  z-index: 1000;
+  user-select: none;
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    sans-serif;
+}
+
+.transport-toggle:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+.transport-toggle.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.transport-toggle:active {
+  transform: translateY(1px);
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE (Original Breakpoints)
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .leaflet-right .leaflet-control.info {
+    width: 100%;
+    z-index: 1000;
+  }
+
+  .transport-toggle {
+    top: 10px;
+    left: 10px;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
