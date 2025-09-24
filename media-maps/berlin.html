@@ -17,6 +17,16 @@
       crossorigin=""
     />
 
+    <!-- Leaflet MarkerCluster CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+    />
+
     <!-- Custom styles -->
     <link rel="stylesheet" href="../shared/css/base.css" />
     <link rel="stylesheet" href="../shared/css/components.css" />
@@ -27,62 +37,32 @@
     <!-- Main container -->
     <main class="map-container">
       <!-- District Selection Controls -->
-        <div class="radio-wrap" id="district-selector">
-          <label class="radio-label">
-            <input
-              type="radio"
-              name="location"
-              id="Friedrichshain-Kreuzberg"
-              onclick="selectDistrict(this)"
-            />
-            <span class="button-label">Friedrichshain-Kreuzberg</span>
-          </label>
-          <label class="radio-label">
-            <input
-              type="radio"
-              name="location"
-              id="Charlottenburg-Wilmersdorf"
-              onclick="selectDistrict(this)"
-            />
-            <span class="button-label">Charlottenburg-Wilmersdorf</span>
-          </label>
-          <label class="radio-label">
-            <input
-              type="radio"
-              name="location"
-              id="Marzahn-Hellersdorf"
-              onclick="selectDistrict(this)"
-            />
-            <span class="button-label">Marzahn-Hellersdorf</span>
-          </label>
-          <label class="radio-label">
-            <input
-              type="radio"
-              name="location"
-              id="Neukölln"
-              onclick="selectDistrict(this)"
-            />
-            <span class="button-label">Neukölln</span>
-          </label>
-          <label class="radio-label">
-            <input
-              type="radio"
-              name="location"
-              id="Pankow"
-              onclick="selectDistrict(this)"
-            />
-            <span class="button-label">Pankow</span>
-          </label>
-          <label class="radio-label">
-            <input
-              type="radio"
-              name="location"
-              id="Tempelhof-Schöneberg"
-              onclick="selectDistrict(this)"
-            />
-            <span class="button-label">Tempelhof-Schöneberg</span>
-          </label>
-        </div>
+      <div class="radio-wrap" id="district-selector">
+        <label class="radio-label">
+          <input type="radio" name="location" id="Friedrichshain-Kreuzberg" />
+          <span class="button-label">Friedrichshain-Kreuzberg</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Charlottenburg-Wilmersdorf" />
+          <span class="button-label">Charlottenburg-Wilmersdorf</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Marzahn-Hellersdorf" />
+          <span class="button-label">Marzahn-Hellersdorf</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Neukölln" />
+          <span class="button-label">Neukölln</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Pankow" />
+          <span class="button-label">Pankow</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Tempelhof-Schöneberg" />
+          <span class="button-label">Tempelhof-Schöneberg</span>
+        </label>
+      </div>
 
       <!-- Map Container -->
       <section class="map-section">
@@ -105,6 +85,9 @@
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
+
+    <!-- Leaflet MarkerCluster JavaScript -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <!-- Platform scripts -->
     <script src="../shared/js/env-loader.js"></script>
@@ -162,6 +145,17 @@
             await loadDistrictBoundaries();
           }
 
+          // Initialize global marker cluster group
+          globalMarkerCluster = L.markerClusterGroup({
+            maxClusterRadius: 50,
+            disableClusteringAtZoom: 16,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            zoomToBoundsOnClick: true,
+            chunkedLoading: true,
+          });
+          globalMarkerCluster.addTo(berlinMediaMap.getMap());
+
           if (BerlinMediaConfig.dataSources.mediaLocations) {
             showLoading("Lade Medienstandorte...");
             await loadMediaLocations();
@@ -197,21 +191,28 @@
       let districtBoundariesLayer;
       let selectedDistrictName = null; // Track currently selected district
 
-      // Define advertising layers upfront (like in the old map)
+      // Global marker cluster group for all advertising markers
+      let globalMarkerCluster;
+
+      // Define advertising layer configurations (colors and visibility state)
       const advertisingLayers = {
-        Brückenwerbung: { group: L.layerGroup(), color: "#1f77b4" },
-        "City Light Poster": { group: L.layerGroup(), color: "#ff7f0e" },
-        "City Light Säule": { group: L.layerGroup(), color: "#2ca02c" },
-        Fassadenwerbung: { group: L.layerGroup(), color: "#d62728" },
-        Großfläche: { group: L.layerGroup(), color: "#9467bd" },
-        "Kreide Stencil": { group: L.layerGroup(), color: "#8c564b" },
-        Leuchtkasten: { group: L.layerGroup(), color: "#e377c2" },
-        Litfaßsäule: { group: L.layerGroup(), color: "#7f7f7f" },
-        Mastenschild: { group: L.layerGroup(), color: "#bcbd22" },
-        Plakatwerbung: { group: L.layerGroup(), color: "#17becf" },
-        Stromkasten: { group: L.layerGroup(), color: "#e41a1c" },
-        Uhrenwerbung: { group: L.layerGroup(), color: "#4daf4a" },
-        "Div. Supermarktwerbung": { group: L.layerGroup(), color: "#984ea3" },
+        Brückenwerbung: { color: "#1f77b4", visible: true, markers: [] },
+        "City Light Poster": { color: "#ff7f0e", visible: true, markers: [] },
+        "City Light Säule": { color: "#2ca02c", visible: true, markers: [] },
+        Fassadenwerbung: { color: "#d62728", visible: true, markers: [] },
+        Großfläche: { color: "#9467bd", visible: true, markers: [] },
+        "Kreide Stencil": { color: "#8c564b", visible: true, markers: [] },
+        Leuchtkasten: { color: "#e377c2", visible: true, markers: [] },
+        Litfaßsäule: { color: "#7f7f7f", visible: true, markers: [] },
+        Mastenschild: { color: "#bcbd22", visible: true, markers: [] },
+        Plakatwerbung: { color: "#17becf", visible: true, markers: [] },
+        Stromkasten: { color: "#e41a1c", visible: true, markers: [] },
+        Uhrenwerbung: { color: "#4daf4a", visible: true, markers: [] },
+        "Div. Supermarktwerbung": {
+          color: "#984ea3",
+          visible: true,
+          markers: [],
+        },
       };
 
       async function loadDistrictBoundaries() {
@@ -290,23 +291,23 @@
             throw new Error("No advertising data available");
           }
 
-          // Add data to appropriate layer groups
+          // Add data to global marker cluster
           for (const layerName in advertisingData) {
             if (layerName in advertisingLayers) {
-              const pointLayer = createPointLayer(
+              const markers = createMarkersForLayer(
                 advertisingData[layerName],
                 layerName,
               );
-              advertisingLayers[layerName].group.addLayer(pointLayer);
+              // Store markers for this layer
+              advertisingLayers[layerName].markers = markers;
+              // Add visible markers to cluster
+              if (advertisingLayers[layerName].visible) {
+                globalMarkerCluster.addLayers(markers);
+              }
             } else {
               console.warn(`Unknown advertising layer: ${layerName}`);
             }
           }
-
-          // Add all layers to map
-          Object.keys(advertisingLayers).forEach((layerName) => {
-            advertisingLayers[layerName].group.addTo(berlinMediaMap.getMap());
-          });
 
           // Setup layer control after all layers are loaded and added to map
           setupLayerControl();
@@ -317,31 +318,43 @@
         }
       }
 
-      function createPointLayer(geoJsonData, categoryName) {
-        const markerOptions = {
-          color: "black",
-          radius: 8,
-          weight: 1,
-          opacity: 1,
-          interactive: true,
-          fillOpacity: 1,
-        };
+      function createMarkersForLayer(geoJsonData, categoryName) {
+        const markers = [];
+        const layerColor = advertisingLayers[categoryName]?.color || "#666666";
 
-        return L.geoJSON(geoJsonData, {
-          pointToLayer: (feature, latlng) =>
-            L.circleMarker(latlng, markerOptions),
-          pane: "markerPane",
-          style: (feature) => ({
-            fillColor: advertisingLayers[categoryName]?.color || "#666666",
-          }),
-          onEachFeature: (feature, layer) => {
+        geoJsonData.features.forEach((feature) => {
+          if (feature.geometry && feature.geometry.type === "Point") {
+            const latlng = [
+              feature.geometry.coordinates[1],
+              feature.geometry.coordinates[0],
+            ];
+
+            const marker = L.circleMarker(latlng, {
+              color: "black",
+              radius: 8,
+              weight: 1,
+              opacity: 1,
+              interactive: true,
+              fillOpacity: 1,
+              fillColor: layerColor,
+              pane: "markerPane",
+            });
+
+            // Add advertising type as a property for filtering
+            marker.advertisingType = categoryName;
+
+            // Bind popup if available
             if (feature.properties && feature.properties.popupContent) {
-              layer.bindPopup(feature.properties.popupContent, {
+              marker.bindPopup(feature.properties.popupContent, {
                 maxWidth: "auto",
               });
             }
-          },
+
+            markers.push(marker);
+          }
         });
+
+        return markers;
       }
 
       function setupDistrictSelection() {
@@ -381,12 +394,10 @@
         // Update selected district
         selectedDistrictName = districtName;
 
-        // Update radio button state if selection came from map click
-        if (fromMapClick) {
-          const radioButton = document.getElementById(districtName);
-          if (radioButton) {
-            radioButton.checked = true;
-          }
+        // Update radio button state - always ensure it's checked when district is selected
+        const radioButton = document.getElementById(districtName);
+        if (radioButton) {
+          radioButton.checked = true;
         }
 
         // Apply selection to map
@@ -581,8 +592,8 @@
 
           // Create checkbox for each advertising layer type
           Object.keys(advertisingLayers).forEach((layerName) => {
-            const layerGroup = advertisingLayers[layerName].group;
-            const layerColor = advertisingLayers[layerName].color;
+            const layerConfig = advertisingLayers[layerName];
+            const layerColor = layerConfig.color;
 
             const label = L.DomUtil.create(
               "label",
@@ -595,13 +606,12 @@
             checkbox.type = "checkbox";
             checkbox.style.color = layerColor; // Color for custom checkbox styling
 
-            // Set initial checked state based on whether layer is on map
-            const isOnMap = layerGroup._map !== null;
-            checkbox.checked = isOnMap;
-            checkbox.defaultChecked = isOnMap;
+            // Set initial checked state based on layer visibility
+            checkbox.checked = layerConfig.visible;
+            checkbox.defaultChecked = layerConfig.visible;
 
             // Ensure checked state is visually reflected (needed for custom CSS styling)
-            if (isOnMap) {
+            if (layerConfig.visible) {
               checkbox.setAttribute("checked", "checked");
               // Force DOM update to ensure custom checkbox styling applies
               setTimeout(() => (checkbox.checked = true), 0);
@@ -617,17 +627,26 @@
             if (event.target.type === "checkbox") {
               const checkbox = event.target;
               const layerName = checkbox.parentElement.innerText.trim();
-              const layerGroup = advertisingLayers[layerName]?.group;
+              const layerConfig = advertisingLayers[layerName];
 
-              if (layerGroup) {
-                // Toggle layer visibility on map
+              if (layerConfig) {
+                // Update layer visibility state
+                layerConfig.visible = checkbox.checked;
+
+                // Toggle markers in global cluster
                 if (checkbox.checked) {
-                  berlinMediaMap.getMap().addLayer(layerGroup);
+                  // Add markers to cluster
+                  if (layerConfig.markers && layerConfig.markers.length > 0) {
+                    globalMarkerCluster.addLayers(layerConfig.markers);
+                  }
                 } else {
-                  berlinMediaMap.getMap().removeLayer(layerGroup);
+                  // Remove markers from cluster
+                  if (layerConfig.markers && layerConfig.markers.length > 0) {
+                    globalMarkerCluster.removeLayers(layerConfig.markers);
+                  }
                 }
               } else {
-                console.error("Layer group not found:", layerName);
+                console.error("Layer configuration not found:", layerName);
               }
             }
           });
