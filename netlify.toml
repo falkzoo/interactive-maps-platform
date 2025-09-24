@@ -4,6 +4,7 @@
 [build]
   # Build settings
   publish = "."
+  functions = "netlify/functions"
   command = "echo 'No build step required - static files'"
 
 # Default redirect rules

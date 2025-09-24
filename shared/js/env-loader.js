@@ -1,8 +1,8 @@
 /**
- * Simple Environment Variable Loader
+ * Environment Configuration Loader for Netlify
  * 
- * Loads .env file for Google Sheets API key and other configuration.
- * Works with any map type - city maps, media maps, etc.
+ * Handles environment variables properly for Netlify deployment.
+ * Uses build-time injection for sensitive values like API keys.
  */
 
 const EnvLoader = {
@@ -10,32 +10,54 @@ const EnvLoader = {
   loaded: false,
 
   /**
-   * Load environment variables from .env file
+   * Load configuration - works with both local development and Netlify
    */
   async load() {
     if (this.loaded) return this.variables;
 
     try {
-      const response = await fetch('/.env');
-      if (!response.ok) {
-        console.info('No .env file found - using defaults');
+      // Try to load from build-time injected config first
+      if (window.ENV_CONFIG) {
+        this.variables = window.ENV_CONFIG;
         this.loaded = true;
         return this.variables;
       }
 
-      const content = await response.text();
-      this.variables = this.parse(content);
+      // Fallback: try to load from config endpoint (Netlify Functions)
+      try {
+        const response = await fetch('/.netlify/functions/config');
+        if (response.ok) {
+          this.variables = await response.json();
+          this.loaded = true;
+          return this.variables;
+        }
+      } catch (configError) {
+        console.info('No Netlify function config available');
+      }
+
+      // Final fallback: try local .env for development
+      try {
+        const response = await fetch('/.env');
+        if (response.ok) {
+          const content = await response.text();
+          this.variables = this.parse(content);
+          console.info('Loaded local .env for development');
+        }
+      } catch (envError) {
+        console.info('No .env file found - using defaults');
+      }
+
       this.loaded = true;
       return this.variables;
     } catch (error) {
-      console.warn('Could not load .env file:', error.message);
+      console.warn('Could not load configuration:', error.message);
       this.loaded = true;
       return this.variables;
     }
   },
 
   /**
-   * Parse .env content
+   * Parse .env content (for local development)
    */
   parse(content) {
     const vars = {};
@@ -80,3 +102,4 @@ const EnvLoader = {
 
 // Export
 window.EnvLoader = EnvLoader;
+

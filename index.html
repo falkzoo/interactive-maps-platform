@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Interactive Maps Platform</title>
+    <title>Interaktive Karten Plattform</title>
     <meta
       name="description"
-      content="Interactive mapping platform with city maps and media location maps"
+      content="Interaktive Kartenplattform mit Stadtkarten und Medienstandort-Karten für Berlin"
     />
     <link rel="stylesheet" href="shared/css/base.css" />
     <link rel="stylesheet" href="shared/css/components.css" />
@@ -15,8 +15,7 @@
   <body>
     <main class="map-container">
       <header class="page-header">
-        <h1>Interactive Maps Platform</h1>
-        <p>Choose your map type and city below</p>
+        <h1>Interaktive Karten Plattform</h1>
       </header>
 
       <section style="padding: 2rem; max-width: 800px; margin: 0 auto">
@@ -28,7 +27,7 @@
             margin-bottom: 2rem;
           "
         >
-          <!-- City Maps -->
+          <!-- Stadtkarten -->
           <div
             style="
               border: 1px solid var(--border);
@@ -36,33 +35,31 @@
               padding: 1.5rem;
             "
           >
-            <h2 style="color: var(--accent); margin-top: 0">🏙️ City Maps</h2>
+            <h2 style="color: var(--accent); margin-top: 0">Stadtkarten</h2>
             <p style="color: var(--muted-fg); margin-bottom: 1rem">
-              District boundaries, transportation routes, and city statistics
+              Bezirksgrenzen, Verkehrsverbindungen und Statistiken
             </p>
             <ul style="list-style: none; padding: 0">
               <li style="margin-bottom: 0.5rem">
                 <a
-                  href="/city-maps/berlin"
+                  href="city-maps/berlin.html"
                   style="
                     color: var(--accent);
                     text-decoration: none;
                     font-weight: 500;
                   "
                 >
-                  → Berlin Districts & Transportation
+                  Berlin
                 </a>
               </li>
-              <li style="margin-bottom: 0.5rem; color: var(--muted-fg)">
-                → Hamburg (coming soon)
-              </li>
-              <li style="margin-bottom: 0.5rem; color: var(--muted-fg)">
-                → Munich (coming soon)
-              </li>
+              <li>Köln - in construction</li>
+              <li>München - in construction</li>
+              <li>Frankfurt - in construction</li>
+              <li>Hamburg - in construction</li>
             </ul>
           </div>
 
-          <!-- Media Maps -->
+          <!-- Medienkarten -->
           <div
             style="
               border: 1px solid var(--border);
@@ -70,45 +67,42 @@
               padding: 1.5rem;
             "
           >
-            <h2 style="color: var(--accent); margin-top: 0">📍 Media Maps</h2>
+            <h2 style="color: var(--accent); margin-top: 0">Medienstandorte</h2>
             <p style="color: var(--muted-fg); margin-bottom: 1rem">
-              Advertising locations, billboards, and media planning
+              Werbestandorte, Plakatflächen und Medienplanung
             </p>
             <ul style="list-style: none; padding: 0">
               <li style="margin-bottom: 0.5rem">
                 <a
-                  href="/media-maps/berlin"
+                  href="media-maps/berlin.html"
                   style="
                     color: var(--accent);
                     text-decoration: none;
                     font-weight: 500;
                   "
                 >
-                  → Berlin Media Locations
+                  Berlin
                 </a>
-                <div
-                  style="
-                    font-size: 0.8em;
-                    color: var(--muted-fg);
-                    margin-left: 1rem;
-                  "
-                >
-                  Multiple map styles available
-                </div>
               </li>
             </ul>
           </div>
         </div>
+
+        <div
+          style="margin-top: 3rem; text-align: center; color: var(--muted-fg)"
+        >
+          <h3 style="color: var(--primary-fg); margin-bottom: 1rem">
+            Über diese Plattform
+          </h3>
+          <p style="max-width: 600px; margin: 0 auto; line-height: 1.6">
+            Diese interaktive Kartenplattform bietet detaillierte Ansichten von
+            Berlin mit verschiedenen Schwerpunkten. Die Stadtkarten zeigen
+            Bezirksinformationen und Verkehrsverbindungen, während die
+            Medienstandort-Karten für die Werbeplanung und Standortanalyse
+            optimiert sind.
+          </p>
+        </div>
       </section>
     </main>
-
-    <script>
-      // Auto-redirect after 10 seconds to Berlin city map
-      setTimeout(() => {
-        if (confirm("Redirect to Berlin city map?")) {
-          window.location.href = "/city-maps/berlin";
-        }
-      }, 10000);
-    </script>
   </body>
 </html>
