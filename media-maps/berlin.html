@@ -62,10 +62,34 @@
           <input type="radio" name="location" id="Tempelhof-Schöneberg" />
           <span class="button-label">Tempelhof-Schöneberg</span>
         </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Mitte" />
+          <span class="button-label">Mitte</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Spandau" />
+          <span class="button-label">Spandau</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Steglitz-Zehlendorf" />
+          <span class="button-label">Steglitz-Zehlendorf</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Treptow-Köpenick" />
+          <span class="button-label">Treptow-Köpenick</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Lichtenberg" />
+          <span class="button-label">Lichtenberg</span>
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="location" id="Reinickendorf" />
+          <span class="button-label">Reinickendorf</span>
+        </label>
       </div>
 
       <!-- Map Container -->
-      <section class="map-section">
+      <section class="Treptow-Köpenick">
         <div class="custom-popup" id="map"></div>
       </section>
     </main>
@@ -147,7 +171,7 @@
 
           // Initialize global marker cluster group
           globalMarkerCluster = L.markerClusterGroup({
-            maxClusterRadius: 50,
+            maxClusterRadius: 40,
             disableClusteringAtZoom: 16,
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
@@ -190,6 +214,7 @@
       // Global variables for layer management
       let districtBoundariesLayer;
       let selectedDistrictName = null; // Track currently selected district
+      let districtGeoJsonFeatures = [];
 
       // Global marker cluster group for all advertising markers
       let globalMarkerCluster;
@@ -209,7 +234,7 @@
         Stromkasten: { color: "#e41a1c", visible: true, markers: [] },
         Uhrenwerbung: { color: "#4daf4a", visible: true, markers: [] },
         "Div. Supermarktwerbung": {
-          color: "#984ea3",
+          color: "#333333",
           visible: true,
           markers: [],
         },
@@ -219,6 +244,7 @@
         try {
           const response = await fetch(BerlinMediaConfig.dataSources.districts);
           const geoJsonData = await response.json();
+          districtGeoJsonFeatures = geoJsonData.features || [];
 
           districtBoundariesLayer = L.geoJSON(geoJsonData, {
             style: () => ({
@@ -311,6 +337,7 @@
 
           // Setup layer control after all layers are loaded and added to map
           setupLayerControl();
+          recalculateDistrictStatistics();
           console.log("Media locations loaded successfully");
         } catch (error) {
           console.error("Error loading media locations:", error);
@@ -420,15 +447,6 @@
               resetDistrictToDefault(layer);
             }
           });
-        } else {
-          // Fallback to coordinates if boundaries not loaded
-          const districtCoords =
-            BerlinMediaConfig.districtCoordinates[districtName];
-          if (districtCoords) {
-            berlinMediaMap
-              .getMap()
-              .setView(districtCoords.center, districtCoords.zoom);
-          }
         }
       }
 
@@ -666,6 +684,90 @@
         };
 
         layerControl.addTo(berlinMediaMap.getMap());
+      }
+
+      function recalculateDistrictStatistics() {
+        if (!districtGeoJsonFeatures || districtGeoJsonFeatures.length === 0) {
+          console.warn(
+            "District statistics cannot be recalculated without boundary data",
+          );
+          return;
+        }
+
+        const newStatistics = {};
+
+        Object.values(advertisingLayers).forEach((layerConfig) => {
+          if (!layerConfig.markers) return;
+          layerConfig.markers.forEach((marker) => {
+            const latlng = marker.getLatLng();
+            const districtName = findDistrictForLatLng(latlng);
+            if (districtName) {
+              newStatistics[districtName] =
+                (newStatistics[districtName] || 0) + 1;
+            }
+          });
+        });
+
+        BerlinMediaConfig.districtStatistics = newStatistics;
+
+        if (selectedDistrictName) {
+          const selectedFeature = districtGeoJsonFeatures.find(
+            (feature) => feature.properties?.name === selectedDistrictName,
+          );
+          updateDistrictInfo(
+            selectedFeature ? selectedFeature.properties : null,
+          );
+        }
+      }
+
+      function findDistrictForLatLng(latlng) {
+        if (!latlng || !districtGeoJsonFeatures) return null;
+        for (const feature of districtGeoJsonFeatures) {
+          if (!feature?.geometry) continue;
+          const geometry = feature.geometry;
+          const name = feature.properties?.name;
+          if (
+            geometry.type === "Polygon" &&
+            isPointInPolygon(latlng, geometry.coordinates)
+          ) {
+            return name;
+          }
+          if (geometry.type === "MultiPolygon") {
+            for (const polygon of geometry.coordinates) {
+              if (isPointInPolygon(latlng, polygon)) {
+                return name;
+              }
+            }
+          }
+        }
+        return null;
+      }
+
+      function isPointInPolygon(latlng, polygonCoords) {
+        if (!polygonCoords || polygonCoords.length === 0) return false;
+        const point = [latlng.lng, latlng.lat];
+        const outerRing = polygonCoords[0];
+        if (!outerRing || outerRing.length === 0) return false;
+
+        let inside = false;
+        for (
+          let i = 0, j = outerRing.length - 1;
+          i < outerRing.length;
+          j = i++
+        ) {
+          const xi = outerRing[i][0];
+          const yi = outerRing[i][1];
+          const xj = outerRing[j][0];
+          const yj = outerRing[j][1];
+
+          const intersect =
+            yi > point[1] !== yj > point[1] &&
+            point[0] <
+              ((xj - xi) * (point[1] - yi)) / (yj - yi + 0.0000001) + xi;
+          if (intersect) inside = !inside;
+        }
+
+        return inside;
       }
 
       function showLoading(message = "Lade Daten...") {

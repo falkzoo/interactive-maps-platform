@@ -30,52 +30,6 @@ const BerlinMediaConfig = {
     // District boundaries - local server source
     districts: "../shared/data/geojson/berlin_districts.geojson",
   },
-
-  // District coordinates for quick navigation
-  districtCoordinates: {
-    "Friedrichshain-Kreuzberg": {
-      center: [52.5065, 13.453],
-      zoom: 13,
-    },
-    "Charlottenburg-Wilmersdorf": {
-      center: [52.5058, 13.3183],
-      zoom: 13,
-    },
-    "Marzahn-Hellersdorf": {
-      center: [52.5441, 13.5794],
-      zoom: 13,
-    },
-    Neukölln: {
-      center: [52.4814, 13.4399],
-      zoom: 13,
-    },
-    Pankow: {
-      center: [52.5755, 13.4015],
-      zoom: 13,
-    },
-    "Tempelhof-Schöneberg": {
-      center: [52.4675, 13.3669],
-      zoom: 13,
-    },
-  },
-
-  // Advertising type categories and colors (from original implementation)
-  advertisingTypes: {
-    Brückenwerbung: { color: "#1f77b4" }, // blue
-    "City Light Poster": { color: "#ff7f0e" }, // orange
-    "City Light Säule": { color: "#2ca02c" }, // green
-    Fassadenwerbung: { color: "#d62728" }, // red
-    Großfläche: { color: "#9467bd" }, // purple
-    "Kreide Stencil": { color: "#8c564b" }, // brown
-    Leuchtkasten: { color: "#e377c2" }, // pink
-    Litfaßsäule: { color: "#7f7f7f" }, // gray
-    Mastenschild: { color: "#bcbd22" }, // yellow-green
-    Plakatwerbung: { color: "#17becf" }, // cyan
-    Stromkasten: { color: "#e41a1c" }, // strong red
-    Uhrenwerbung: { color: "#4daf4a" }, // strong green
-    "Div. Supermarktwerbung": { color: "#984ea3" }, // violet
-  },
-
   // District statistics (number of advertising displays per district)
   districtStatistics: {
     "Friedrichshain-Kreuzberg": 27,

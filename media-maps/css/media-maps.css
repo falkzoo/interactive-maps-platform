@@ -41,7 +41,7 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin: 20px 0;
+  /* margin: 20px 0; */
   padding: 20px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
@@ -154,7 +154,7 @@ form {
 /* Form control wrapper (Original Styling) */
 .form-control {
   font-family: inherit;
-  font-size: 1.0rem;
+  font-size: 1rem;
   font-weight: bold;
   line-height: 1.1;
   background-color: transparent;
@@ -320,23 +320,31 @@ input[type="checkbox"]:checked::before {
 }
 
 .media-marker--billboard {
-  background-color: #FF6B6B;
+  background-color: #ff6b6b;
 }
 
 .media-marker--digital {
-  background-color: #4ECDC4;
+  background-color: #4ecdc4;
 }
 
 .media-marker--transit {
-  background-color: #45B7D1;
+  background-color: #45b7d1;
 }
 
 .media-marker--furniture {
-  background-color: #96CEB4;
+  background-color: #96ceb4;
 }
 
 .media-marker--building {
-  background-color: #FFEAA7;
+  background-color: #ffeaa7;
+}
+
+.media-cluster {
+  width: 40px;
+  height: 40px;
+  background-color: greenyellow;
+  text-align: center;
+  font-size: 24px;
 }
 
 /* ==========================================================================
@@ -447,16 +455,16 @@ input[type="checkbox"]:checked::before {
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .popup-layout {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .popup-info-section {
     min-width: auto;
   }
-  
+
   .media-legend {
     bottom: 10px;
     left: 10px;
@@ -468,10 +476,11 @@ input[type="checkbox"]:checked::before {
   .media-popup {
     min-width: 200px;
   }
-  
+
   .media-legend {
     position: relative;
     margin: 10px;
     max-width: none;
   }
 }
+

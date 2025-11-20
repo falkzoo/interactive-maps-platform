@@ -1,6 +1,6 @@
 /**
  * Google Sheets Data Processor for Media Maps
- * 
+ *
  * Replaces the Python script workflow by directly fetching data from Google Sheets
  * and transforming it to the expected GeoJSON format with rich popup content.
  */
@@ -10,7 +10,7 @@ const SheetsDataProcessor = {
   cache: {
     data: null,
     timestamp: null,
-    duration: 5 * 60 * 1000 // 5 minutes cache
+    duration: 5 * 60 * 1000, // 5 minutes cache
   },
 
   /**
@@ -19,51 +19,52 @@ const SheetsDataProcessor = {
    * @param {string} range - Sheet range (e.g., 'Sheet1!A:K' or 'Tabellenblatt1!A:K')
    * @returns {Promise<Object>} Processed GeoJSON data
    */
-  async fetchAndProcess(sheetId, range = 'Tabellenblatt1!A:K') {
+  async fetchAndProcess(sheetId, range = "Tabellenblatt1!A:K") {
     // Check cache first
     if (this.isCacheValid()) {
-      console.log('Using cached Google Sheets data');
+      console.log("Using cached Google Sheets data");
       return this.cache.data;
     }
 
     try {
-      console.log('Fetching fresh data from Google Sheets...');
-      
+      console.log("Fetching fresh data from Google Sheets...");
+
       // Load environment variables
       await EnvLoader.load();
-      
+
       // Build Google Sheets API URL
       const sheetsUrl = EnvLoader.buildSheetsUrl(sheetId, range);
-      
+
       if (!sheetsUrl) {
-        throw new Error('Google Sheets API key not configured');
+        throw new Error("Google Sheets API key not configured");
       }
 
       // Fetch data from Google Sheets
       const response = await fetch(sheetsUrl);
-      
+
       if (!response.ok) {
-        throw new Error(`Google Sheets API error: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Google Sheets API error: ${response.status} ${response.statusText}`,
+        );
       }
 
       const data = await response.json();
-      
+
       if (!data.values || data.values.length < 2) {
-        throw new Error('No data found in Google Sheets');
+        throw new Error("No data found in Google Sheets");
       }
 
       // Process the data
       const processedData = this.processSheetData(data.values);
-      
+
       // Update cache
       this.cache.data = processedData;
       this.cache.timestamp = Date.now();
-      
-      console.log('Successfully processed Google Sheets data');
-      return processedData;
 
+      console.log("Successfully processed Google Sheets data");
+      return processedData;
     } catch (error) {
-      console.error('Error fetching from Google Sheets:', error);
+      console.error("Error fetching from Google Sheets:", error);
       throw error;
     }
   },
@@ -72,9 +73,11 @@ const SheetsDataProcessor = {
    * Check if cached data is still valid
    */
   isCacheValid() {
-    return this.cache.data && 
-           this.cache.timestamp && 
-           (Date.now() - this.cache.timestamp) < this.cache.duration;
+    return (
+      this.cache.data &&
+      this.cache.timestamp &&
+      Date.now() - this.cache.timestamp < this.cache.duration
+    );
   },
 
   /**
@@ -93,74 +96,84 @@ const SheetsDataProcessor = {
   processSheetData(values) {
     const headers = values[0];
     const rows = values.slice(1);
-    
+
     // Create the main data structure
     const data = {};
-    
+
     // Process each row
-    rows.forEach(row => {
+    rows.forEach((row) => {
       if (row.length < 9 || !row[0] || !row[9]) {
         // Skip rows without required data (Name and Koordinaten)
         return;
       }
-      
+
       // Create row object from headers
       const rowData = {};
       headers.forEach((header, index) => {
-        rowData[header] = row[index] || '';
+        rowData[header] = row[index] || "";
       });
-      
+
       // Skip if no coordinates
-      if (!rowData['Koordinaten']) {
+      if (!rowData["Koordinaten"]) {
         return;
       }
-      
+
       // Parse coordinates
       let coordinates;
       try {
-        const coordParts = rowData['Koordinaten'].split(',').map(c => parseFloat(c.trim()));
-        if (coordParts.length !== 2 || isNaN(coordParts[0]) || isNaN(coordParts[1])) {
-          console.warn(`Invalid coordinates for ${rowData['Name']}: ${rowData['Koordinaten']}`);
+        const coordParts = rowData["Koordinaten"]
+          .split(",")
+          .map((c) => parseFloat(c.trim()));
+        if (
+          coordParts.length !== 2 ||
+          isNaN(coordParts[0]) ||
+          isNaN(coordParts[1])
+        ) {
+          console.warn(
+            `Invalid coordinates for ${rowData["Name"]}: ${rowData["Koordinaten"]}`,
+          );
           return;
         }
         coordinates = coordParts;
       } catch (error) {
-        console.warn(`Error parsing coordinates for ${rowData['Name']}: ${rowData['Koordinaten']}`);
+        console.warn(
+          `Error parsing coordinates for ${rowData["Name"]}: ${rowData["Koordinaten"]}`,
+        );
         return;
       }
-      
+
       // Get category from Werbeträger
-      const category = rowData['Werbeträger'];
+      const category = rowData["Werbeträger"];
       if (!category) {
-        console.warn(`No Werbeträger specified for ${rowData['Name']}`);
+        console.warn(`No Werbeträger specified for ${rowData["Name"]}`);
         return;
       }
-      
+
       // Initialize category if it doesn't exist
       if (!data[category]) {
         data[category] = {
           type: "FeatureCollection",
-          features: []
+          features: [],
         };
       }
-      
+
       // Create GeoJSON feature
       const feature = {
         type: "Feature",
         properties: {
-          Name: rowData['Name'],
+          Name: rowData["Name"],
           popupContent: this.generatePopup(rowData),
-          Category: category
+          Category: category,
         },
         geometry: {
           type: "Point",
-          coordinates: coordinates
-        }
+          coordinates: coordinates,
+        },
       };
-      
+
       data[category].features.push(feature);
     });
-    
+
     return data;
   },
 
@@ -172,7 +185,7 @@ const SheetsDataProcessor = {
   generatePopup(row) {
     const infoSection = this.generateInfoSection(row);
     const imagesSection = this.generateImagesSection(row);
-    
+
     const popupHtml = `
       <div class='location-popup'>
         <div class='popup-layout'>
@@ -185,9 +198,9 @@ const SheetsDataProcessor = {
         </div>
       </div>
     `;
-    
+
     // Remove extra whitespace and newlines for cleaner output
-    return popupHtml.split(/\s+/).join(' ').trim();
+    return popupHtml.split(/\s+/).join(" ").trim();
   },
 
   /**
@@ -197,29 +210,29 @@ const SheetsDataProcessor = {
    */
   generateInfoSection(row) {
     const visibleColumns = [
-      'Werbeträger',
-      'Ort', 
-      'Standort',
-      'Maße',
-      'Beleuchtung',
-      'Buchungsintervall',
-      'Vorlaufzeit'
+      "Werbeträger",
+      "Ort",
+      "Standort",
+      "Maße",
+      "Beleuchtung",
+      "Buchungsintervall",
+      "Vorlaufzeit",
     ];
-    
-    let infoSection = `<h3>${row['Name']}</h3><br>`;
-    
-    visibleColumns.forEach(column => {
+
+    let infoSection = `<h3>${row["Name"]}</h3><br>`;
+
+    visibleColumns.forEach((column) => {
       const data = row[column];
       if (data) {
         infoSection += `${column}: ${data}<br>`;
       }
     });
-    
+
     infoSection += `
       <br>
       <img src='https://www.wtm-aussenwerbung.de/wp-content/uploads/wtm-aussenwerbung.webp' style='width: 10vw;'>
     `;
-    
+
     return infoSection;
   },
 
@@ -229,16 +242,16 @@ const SheetsDataProcessor = {
    * @returns {string} HTML images section
    */
   generateImagesSection(row) {
-    let imagesHtml = '';
-    
+    let imagesHtml = "";
+
     // Add custom images if they exist
-    if (row['Bild1']) {
-      imagesHtml += this.generateImageHtml(row['Bild1']);
+    if (row["Bild1"]) {
+      imagesHtml += this.generateImageHtml(row["Bild1"]);
     }
-    if (row['Bild2']) {
-      imagesHtml += this.generateImageHtml(row['Bild2']);
+    if (row["Bild2"]) {
+      imagesHtml += this.generateImageHtml(row["Bild2"]);
     }
-    
+
     return imagesHtml;
   },
 
@@ -249,10 +262,10 @@ const SheetsDataProcessor = {
    */
   generateImageHtml(imageUrl) {
     if (!imageUrl) {
-      return '';
+      return "";
     }
     return `<img src='${imageUrl}' style='width: 15vw; min-width: 200px;'>`;
-  }
+  },
 };
 
 // Export for global access
